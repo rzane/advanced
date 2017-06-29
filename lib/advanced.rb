@@ -1,8 +1,11 @@
 require 'advanced/version'
-require 'advanced/scope'
 require 'advanced/search'
 require 'advanced/search_form'
+require 'advanced/active_record'
+require 'advanced/builders/scope'
 
 module Advanced
-  # Your code goes here...
+  def self.scope(*args)
+    Advanced::Builders::Scope.new(*args)
+  end
 end

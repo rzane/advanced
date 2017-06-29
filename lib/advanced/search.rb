@@ -1,5 +1,4 @@
 require 'forwardable'
-require 'active_support/core_ext/hash/slice'
 require 'advanced/step'
 require 'advanced/builders/form'
 require 'advanced/builders/search'
@@ -8,19 +7,17 @@ module Advanced
   class Search < SimpleDelegator
     class << self
       def steps
-        @steps ||= compile
-      end
-
-      def properties
-        @properties ||= []
-      end
-
-      def property(name)
-        properties << name
+        @steps ||= instance_methods.grep(Step::PATTERN).reverse.map do |m|
+          Step.extract(instance_method(m))
+        end
       end
 
       def parameter_names
-        steps.flat_map(&:parameter_names) + properties
+        @parameter_names ||= steps.flat_map(&:names)
+      end
+
+      def parameter(name)
+        parameter_names << name
       end
 
       def form
@@ -30,19 +27,13 @@ module Advanced
       def search
         Builders::Search.new(self)
       end
-
-      private
-
-      def compile
-        instance_methods.grep(Step::PATTERN).reverse.map do |m|
-          Step.from_method(instance_method(m))
-        end
-      end
     end
 
     alias scope __getobj__
-    alias scope= __setobj__
 
+    # Because we're going to __setobj__, it's probably a good
+    # idea to clone this, just incase someone is using it like
+    # a singleton.
     def call(params = {})
       clone.call!(params)
     end
@@ -51,8 +42,12 @@ module Advanced
       params = params.to_h
 
       self.class.steps.each do |step|
-        result = run_step(step.name, step.slice(params))
-        self.scope = result if result
+        result = run_step(
+          step.name,
+          step.slice(params)
+        )
+
+        __setobj__(result) if result
       end
 
       scope

@@ -1,48 +1,42 @@
-require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/hash/slice'
 
 module Advanced
   class Step
+    class InvalidError < StandardError
+    end
+
     PATTERN = /\A(search|then)_/
 
-    def self.from_method(m)
-      keys = Hash.new { |h, k| h[k] = [] }
+    def self.extract(meth)
+      step = new(meth.name, meth.parameters)
 
-      m.parameters.each do |type, name|
-        case type
-        when :keyreq
-          keys[:requires] << name
-        when :key
-          keys[:permits] << name
-        when :keyrest
-          keys[:all] = true
-        end
+      if step.invalid_types.any?
+        raise InvalidError, "The signature for ##{step.name} must only use keyword arguments."
       end
 
-      keys[:none] = m.parameters.empty?
-
-      new(m.name, keys)
+      step
     end
 
-    attr_reader :name, :requires, :permits
+    attr_reader :name, :requires, :permits, :names, :types
 
-    def initialize(name, requires: [], permits: [], all: false, none: false)
+    def initialize(name, keys = [])
       @name     = name
-      @requires = requires
-      @permits  = permits
-      @all      = all
-      @none     = none
-    end
-
-    def parameter_names
-      @permits + @requires
+      @types    = keys.map(&:first)
+      @names    = keys.map(&:last)
+      @requires = grab(keys, :keyreq)
+      @permits  = grab(keys, :key)
     end
 
     def all?
-      @all
+      types.include? :keyrest
     end
 
     def none?
-      @none
+      types.empty?
+    end
+
+    def invalid_types
+      types - [:key, :keyreq, :keyrest]
     end
 
     def slice(params)
@@ -54,6 +48,12 @@ module Advanced
       return params if all?
 
       values.merge params.slice(*permits)
+    end
+
+    private
+
+    def grab(keys, type)
+      keys.select { |k, _| k == type }.map(&:last)
     end
   end
 end

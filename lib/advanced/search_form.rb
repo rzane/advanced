@@ -1,26 +1,26 @@
-require 'set'
 require 'active_support/core_ext/object/blank'
-require 'active_model'
 
 module Advanced
   class SearchForm
-    include ActiveModel::Model
+    begin
+      require 'active_model'
+      include ActiveModel::Model
+    rescue LoadError
+    end
 
     def self.parameter_names
       @parameter_names ||= []
     end
 
-    def self.attribute(name)
-      self.parameter_names << name
-      attr_accessor name
-    end
-
-    def self.attributes(*names)
+    def self.parameter(*names)
       names.flatten.each do |name|
-        attribute(name)
+        parameter_names << name
+        attr_accessor name
       end
     end
 
+    # We know exactly what parameters are whitelisted,
+    # so, we can skip by AC::Parameters.
     def initialize(opts = nil)
       if opts.respond_to? :to_unsafe_h
         super opts.to_unsafe_h
@@ -33,6 +33,9 @@ module Advanced
       to_h.blank?
     end
 
+    # Pull out the blank values. Recursively check if the
+    # resulting object responds to #to_search_h, as this
+    # would indicate a SearchForm object.
     def to_search_h
       self.class.parameter_names.reduce({}) do |acc, key|
         value = public_send(key)
