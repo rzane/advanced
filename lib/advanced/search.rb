@@ -11,8 +11,16 @@ module Advanced
         @steps ||= compile
       end
 
+      def properties
+        @properties ||= []
+      end
+
+      def property(name)
+        properties << name
+      end
+
       def parameter_names
-        steps.flat_map(&:parameter_names)
+        steps.flat_map(&:parameter_names) + properties
       end
 
       def form
