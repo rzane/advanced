@@ -1,7 +1,6 @@
 require 'forwardable'
 require 'advanced/step'
-require 'advanced/builders/form'
-require 'advanced/builders/search'
+require 'advanced/builders'
 
 module Advanced
   class Search < SimpleDelegator
@@ -26,6 +25,10 @@ module Advanced
 
       def search
         Builders::Search.new(self)
+      end
+
+      def scope(key)
+        Builders::Scope.new(key, self)
       end
     end
 
