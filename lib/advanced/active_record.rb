@@ -27,7 +27,7 @@ module Advanced
       end
 
       def defsearch(param, &block)
-        property(param)
+        parameter(param)
 
         define_method "search_#{param}" do |**opts|
           instance_exec(opts[param], &block) if opts[param]
