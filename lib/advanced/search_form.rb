@@ -1,8 +1,11 @@
 require 'set'
 require 'active_support/core_ext/object/blank'
+require 'active_model'
 
 module Advanced
   class SearchForm
+    include ActiveModel::Model
+
     def self.parameter_names
       @parameter_names ||= []
     end
