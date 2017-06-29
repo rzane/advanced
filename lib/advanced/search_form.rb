@@ -21,7 +21,7 @@ module Advanced
       end
     end
 
-    def initialize(opts)
+    def initialize(opts = nil)
       if opts.respond_to? :to_unsafe_h
         super opts.to_unsafe_h
       else
