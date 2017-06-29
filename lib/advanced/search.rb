@@ -12,11 +12,11 @@ module Advanced
       end
 
       def parameter_names
-        @parameter_names ||= steps.flat_map(&:names)
+        steps.flat_map(&:names) + additional_parameter_names
       end
 
       def parameter(name)
-        parameter_names << name
+        additional_parameter_names << name
       end
 
       def form
@@ -29,6 +29,12 @@ module Advanced
 
       def scope(name = :search)
         Builders::Scope.new(self, name)
+      end
+
+      private
+
+      def additional_parameter_names
+        @additional_parameter_names ||= []
       end
     end
 
