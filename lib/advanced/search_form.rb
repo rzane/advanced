@@ -18,6 +18,14 @@ module Advanced
       end
     end
 
+    def initialize(opts)
+      if opts.respond_to? :to_unsafe_h
+        super opts.to_unsafe_h
+      else
+        super
+      end
+    end
+
     def blank?
       to_h.blank?
     end
