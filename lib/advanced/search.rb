@@ -27,8 +27,8 @@ module Advanced
         Builders::Search.new(self)
       end
 
-      def scope(key)
-        Builders::Scope.new(key, self)
+      def scope(name = :search)
+        Builders::Scope.new(self, name)
       end
     end
 
