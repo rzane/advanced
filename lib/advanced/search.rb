@@ -1,22 +1,16 @@
 require 'forwardable'
-require 'advanced/step'
+require 'advanced/definition'
 require 'advanced/builders'
 
 module Advanced
   class Search < SimpleDelegator
     class << self
-      def steps
-        @steps ||= instance_methods.grep(Step::PATTERN).reverse.map do |m|
-          Step.extract(instance_method(m))
-        end
+      def definition
+        @definition ||= Definition.new(self)
       end
 
       def parameter_names
-        steps.flat_map(&:names) + additional_parameter_names
-      end
-
-      def parameter(name)
-        additional_parameter_names << name
+        definition.parameter_names
       end
 
       def form
@@ -30,15 +24,13 @@ module Advanced
       def scope(name = :search)
         Builders::Scope.new(self, name)
       end
-
-      private
-
-      def additional_parameter_names
-        @additional_parameter_names ||= []
-      end
     end
 
     alias scope __getobj__
+
+    def steps
+      self.class.definition.steps
+    end
 
     # Because we're going to __setobj__, it's probably a good
     # idea to clone this, just incase someone is using it like
@@ -50,29 +42,14 @@ module Advanced
     def call!(params = {}) # private
       params = params.to_h
 
-      self.class.steps.each do |step|
-        result = run_step(
-          step.name,
-          step.slice(params)
-        )
-
-        __setobj__(result) if result
+      steps.reverse_each do |name, requirements|
+        if requirements.all? { |k| params[k] }
+          result = public_send(name, params)
+          __setobj__(result) if result
+        end
       end
 
       scope
-    end
-
-    private
-
-    def run_step(name, opts)
-      case opts
-      when :invalid
-        # missing required params, skip
-      when :none
-        public_send(name)
-      else
-        public_send(name, opts)
-      end
     end
   end
 end

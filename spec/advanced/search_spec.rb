@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class SearchOne < Advanced::Search
-  def search_gt(gt:)
+  def search_gt(gt:, **)
     select { |v| v > gt }
   end
 end
@@ -9,7 +9,7 @@ end
 class SearchTwo < Advanced::Search
   include SearchOne.search
 
-  def then_double
+  def then_double(**)
     map { |v| v * 2 }
   end
 end
