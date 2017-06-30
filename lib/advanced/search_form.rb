@@ -8,13 +8,13 @@ module Advanced
     rescue LoadError
     end
 
-    def self.parameter_names
-      @parameter_names ||= []
+    def self.attribute_names
+      @attribute_names ||= []
     end
 
-    def self.parameter(*names)
+    def self.attribute(*names)
       names.flatten.each do |name|
-        parameter_names << name
+        attribute_names << name
         attr_accessor name
       end
     end
@@ -37,7 +37,7 @@ module Advanced
     # resulting object responds to #to_search_h, as this
     # would indicate a SearchForm object.
     def to_search_h
-      self.class.parameter_names.reduce({}) do |acc, key|
+      self.class.attribute_names.reduce({}) do |acc, key|
         value = public_send(key)
         value = value.to_search_h if value.respond_to?(:to_search_h)
         value = value.presence

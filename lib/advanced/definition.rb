@@ -7,6 +7,11 @@ module Advanced
 
     def initialize(klass)
       @klass = klass
+      @additional_parameter_names = []
+    end
+
+    def add_parameters(keys = [])
+      @additional_parameter_names += keys
     end
 
     def steps
@@ -16,9 +21,11 @@ module Advanced
     end
 
     def parameter_names
-      search_methods.flat_map do |meth|
+      values = search_methods.flat_map do |meth|
         grab(meth.parameters, KEY_TYPES)
       end
+
+      values.to_a + @additional_parameter_names
     end
 
     private

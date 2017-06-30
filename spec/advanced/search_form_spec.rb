@@ -12,9 +12,9 @@ class DummySearch < Advanced::Search
 end
 
 RSpec.describe Advanced::SearchForm do
-  describe '.parameter_names' do
-    it 'adds the parameter names' do
-      expect(DummySearch::Form.parameter_names).to match_array([:id])
+  describe '.attribute_names' do
+    it 'adds the attribute names' do
+      expect(DummySearch::Form.attribute_names).to match_array([:id])
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.describe Advanced::SearchForm do
     end
   end
 
-  it 'defines the parameters' do
+  it 'defines the attributes' do
     form = DummySearch::Form.new
     form.id = 1
     expect(form.id).to eq(1)

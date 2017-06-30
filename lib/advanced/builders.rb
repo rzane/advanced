@@ -5,7 +5,7 @@ module Advanced
       def initialize(search)
         define_singleton_method :included do |base|
           search.parameter_names.each do |name|
-            base.parameter(name)
+            base.attribute(name)
           end
         end
       end
