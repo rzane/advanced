@@ -13,8 +13,12 @@ module Advanced
         definition.parameter_names
       end
 
-      def form
-        Builders::Form.new(self)
+      def form(key: nil)
+        if key
+          Builders::NestedForm.new(self, key)
+        else
+          Builders::Form.new(self)
+        end
       end
 
       def search

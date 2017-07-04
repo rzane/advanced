@@ -8,7 +8,7 @@ module Advanced
       end
 
       def where_any_eq(param, column: param)
-        define_search param, [param] do |value|
+        define_search param, [param] do |values|
           values = values.reject(&:blank?)
           where column => values if values.any?
         end
