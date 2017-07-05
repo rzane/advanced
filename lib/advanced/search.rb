@@ -13,12 +13,10 @@ module Advanced
         definition.parameter_names
       end
 
-      def form
-        Builders::Form.new(self)
-      end
-
-      def search
-        Builders::Search.new(self)
+      def use(other)
+        define_method "search_#{other.name}" do |**opts|
+          other.new(scope).call(**opts)
+        end
       end
 
       def scope(name = :search)

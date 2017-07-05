@@ -1,3 +1,4 @@
+require 'set'
 require 'active_support/core_ext/object/blank'
 
 module Advanced
@@ -9,7 +10,7 @@ module Advanced
     end
 
     def self.attribute_names
-      @attribute_names ||= []
+      @attribute_names ||= Set.new
     end
 
     def self.attribute(*names)
@@ -19,8 +20,23 @@ module Advanced
       end
     end
 
-    def self.nested(key)
-      Builders::NestedForm.new(self, key)
+    def self.search(value)
+      attribute(*value.parameter_names)
+    end
+
+    def self.nested(key, form)
+      ivar = :"@#{key}"
+
+      attribute_names << key
+
+      define_method key do
+        instance_variable_get(ivar) ||
+          instance_variable_set(ivar, form.new)
+      end
+
+      define_method "#{key}=" do |values|
+        instance_variable_set(ivar, form.new(values))
+      end
     end
 
     # We know exactly what parameters are whitelisted,

@@ -7,7 +7,7 @@ class SearchOne < Advanced::Search
 end
 
 class SearchTwo < Advanced::Search
-  include SearchOne.search
+  use SearchOne
 
   def then_double(**)
     map { |v| v * 2 }
