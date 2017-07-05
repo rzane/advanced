@@ -19,6 +19,10 @@ module Advanced
       end
     end
 
+    def self.nested(key)
+      Builders::NestedForm.new(self, key)
+    end
+
     # We know exactly what parameters are whitelisted,
     # so, we can skip by AC::Parameters.
     def initialize(opts = nil)

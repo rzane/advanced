@@ -12,16 +12,16 @@ module Advanced
     end
 
     class NestedForm < Module
-      def initialize(search, key)
+      def initialize(form, key)
         ivar = :"@#{key}"
 
         define_method key do
           instance_variable_get(ivar) ||
-            instance_variable_set(ivar, search.new)
+            instance_variable_set(ivar, form.new)
         end
 
         define_method "#{key}=" do |values|
-          instance_variable_set(ivar, search.new(values))
+          instance_variable_set(ivar, form.new(values))
         end
       end
     end
