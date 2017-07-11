@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 class SearchOne < Advanced::Search
-  def search_gt(gt:, **)
-    select { |v| v > gt }
+  def search_add(add:, **)
+    map { |v| v + add }
   end
 end
 
@@ -28,19 +28,19 @@ RSpec.describe Advanced::Search do
   end
 
   it 'runs based on matching params' do
-    expect(one.call(gt: 1)).to eq([2, 3])
+    expect(one.call(add: 1)).to eq([2, 3, 4])
   end
 
   it 'does nothing if params dont match' do
-    expect(one.call(lt: 2)).to eq([1, 2, 3])
+    expect(one.call(bogus: 2)).to eq([1, 2, 3])
   end
 
   it 'does not change the original scope' do
-    one.call(gt: 1)
+    one.call(add: 1)
     expect(one.scope).to eq(one.scope)
   end
 
   it 'is composable' do
-    expect(two.call(gt: 1)).to eq([4, 6])
+    expect(two.call(add: 1)).to eq([3, 5, 7])
   end
 end

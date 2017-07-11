@@ -1,21 +1,25 @@
-require 'forwardable'
+require 'pipey'
 require 'advanced/definition'
 require 'advanced/builders'
 
 module Advanced
-  class Search < SimpleDelegator
+  class Search < Pipey::Chain
+    extend Pipey::Steps::Scanner[/\A(search|then)_/]
+    extend Pipey::Extensions::RequiredKeys
+    extend Pipey::Extensions::IgnoreNil
+
     class << self
       def definition
-        @definition ||= Definition.new(self)
+        @definition ||= Definition.new
       end
 
       def parameter_names
-        definition.parameter_names
+        definition.parameter_names_for(self)
       end
 
       def use(other)
         define_method "search_#{other.name}" do |**opts|
-          other.new(scope).call(**opts)
+          other.call(scope, **opts)
         end
       end
 
@@ -24,8 +28,8 @@ module Advanced
       end
 
       def define_search(name, requirements = [], permits = [], &block)
-        definition.add_parameters(requirements)
-        definition.add_parameters(permits)
+        definition.add(requirements)
+        definition.add(permits)
 
         define_method "search_#{name}" do |**opts|
           if requirements.all? { |k| opts[k] }
@@ -41,28 +45,8 @@ module Advanced
 
     alias scope __getobj__
 
-    def steps
-      self.class.definition.steps
-    end
-
-    # Because we're going to __setobj__, it's probably a good
-    # idea to clone this, just incase someone is using it like
-    # a singleton.
     def call(params = {})
-      clone.call!(params)
-    end
-
-    def call!(params = {}) # private
-      params = params.to_h
-
-      steps.reverse_each do |name, requirements|
-        if requirements.all? { |k| params[k] }
-          result = public_send(name, params)
-          __setobj__(result) if result
-        end
-      end
-
-      scope
+      super(params.to_h)
     end
   end
 end
