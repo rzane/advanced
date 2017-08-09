@@ -39,7 +39,7 @@ module Advanced
       end
 
       # make rails form_for work nicely
-      alias :"#{key}_attributes=", :"#{key}="
+      alias :"#{key}_attributes=" :"#{key}="
     end
 
     # We know exactly what parameters are whitelisted,
