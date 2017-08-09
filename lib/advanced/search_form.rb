@@ -37,6 +37,9 @@ module Advanced
       define_method "#{key}=" do |values|
         instance_variable_set(ivar, form.new(values))
       end
+
+      # make rails form_for work nicely
+      alias :"#{key}_attributes=", :"#{key}="
     end
 
     # We know exactly what parameters are whitelisted,
