@@ -2,6 +2,8 @@
 
 Advanced is a library for building complex searches with Active Record.
 
+[Click here to see the source for the demo application.](https://github.com/rzane/advanced_demo)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -112,7 +114,7 @@ end
 
 Your view might look something like this:
 
-```
+```erb
 <%= form_for @form, method: :get, url: states_path, as: :q do |f| %>
   <p>
     <%= f.label :name %>
@@ -158,6 +160,26 @@ form = CitySearch::Form.new(name: 'New York', state: { name: 'New York' })
 form.name #=> 'New York'
 form.state.name #=> 'New York'
 form.to_h #=> { name: 'New York', state: { name: 'New York' }}
+```
+
+Then, in your view, you can use `fields_for` to generate your form fields:
+
+```ruby
+<%= form_for @form, method: :get, url: cities_path, as: :q do |f| %>
+  <p>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </p>
+
+  <%= f.fields_for :state do |state| %>
+    <p>
+      <%= state.label :name, 'State' %>
+      <%= state.text_field :name %>
+    </p>
+  <% end %>
+
+  <%= f.submit 'Search' %>
+<% end %>
 ```
 
 # Other goodies
