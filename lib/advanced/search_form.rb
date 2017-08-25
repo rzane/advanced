@@ -34,10 +34,8 @@ module Advanced
           instance_variable_set(ivar, form.new)
       end
 
-      ["#{key}=", "#{key}_attributes="].each do |name|
-        define_method(name) do |values|
-          instance_variable_set(ivar, form.new(values))
-        end
+      define_method("#{key}=") do |values|
+        instance_variable_set(ivar, form.new(values))
       end
     end
 
